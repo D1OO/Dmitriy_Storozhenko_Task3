@@ -1,7 +1,5 @@
 package net.shvdy;
 
-import java.util.ArrayList;
-
 public class Model {
 
     public static final int MIN_RANGE = 0;
@@ -30,13 +28,5 @@ public class Model {
             throw new AttemptOutOfBoundsException();
         }
         return false;
-    }
-
-    public String createSentence(String[] words){
-        StringBuilder sentenceBuilder = new StringBuilder();
-        for(String s : words) {
-            sentenceBuilder.append(s + " ");
-        }
-        return sentenceBuilder.toString().trim();
     }
 }
