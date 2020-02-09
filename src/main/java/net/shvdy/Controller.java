@@ -12,70 +12,69 @@ public class Controller {
 
     public Controller(Model model, View view) {
         sc = new Scanner(System.in);
-        this.model  = model;
+        this.model = model;
         this.view = view;
     }
 
-    public void processSession(){
-        view.printWelcomeMessage(model.MIN_RANGE, model.MAX_RANGE);
-        ArrayList<HashMap<Boolean, ArrayList<Integer>>> gamesStats = new ArrayList();
-
-        while (true){
-            gamesStats.add(newGame());
+    public void processSession() {
+        view.printWelcomeMessage(model.getMinRange(), model.getMaxRange());
+        while (true) {
+            model.setForNewGame();
+            newGame();
             view.printStatsHeader();
-            int k=1;
-            for (HashMap<Boolean, ArrayList<Integer>> game : gamesStats){
-                view.printStatsMessage(k++, (Boolean)game.keySet().toArray()[0], (ArrayList)game.get(game.keySet().toArray()[0]));
+            int k = 1;
+            for (HashMap<Boolean, ArrayList<Integer>> game : model.getSessionStats()) {
+                view.printStatsMessage(k++, (Boolean) game.keySet().toArray()[0], (ArrayList) game.get(game.keySet().toArray()[0]));
             }
         }
     }
 
-    private HashMap<Boolean, ArrayList<Integer>> newGame(){
-        HashMap<Boolean, ArrayList<Integer>> gameInfo = new HashMap<>();
-        ArrayList allAttempts = new ArrayList();
+    private void newGame() {
+        ArrayList<Integer> allAttempts = new ArrayList();
         boolean correctAnswer = false;
         int attemptsCount = 1;
 
-        while (!correctAnswer){
-            view.printAttemptMessage(attemptsCount,allAttempts);
-            int attempt=0;
+        while (!correctAnswer) {
+            view.printAttemptMessage(model.getMinRange(), model.getMaxRange(), attemptsCount, allAttempts);
+            int attempt = 0;
 
-            while (true){
+            while (true) {
                 try {
                     String input = sc.nextLine();
-                    if (input.equals("I give up")){
+                    if (input.equals("I give up")) {
                         view.printGiveUpMessage(model.getCorrectAnswer());
                         correctAnswer = true;
-                        gameInfo.put(false, allAttempts);
-                    } else if  (input.equals("Exit")){
+                        addGameStatsToModel(false, allAttempts);
+                    } else if (input.equals("Exit")) {
                         System.exit(0);
                     } else {
                         attempt = Integer.parseInt(input);
-                        if (!allAttempts.contains(attempt)){
-                            try {
-                                if (model.checkAttempt(attempt)){
-                                    view.printWinnerMessage();
-                                    correctAnswer = true;
-                                    gameInfo.put(true, allAttempts);
-                                } else {
-                                    view.printTryAgainMessage();
-                                }
-                                allAttempts.add(attempt);
-                                attemptsCount++;
-                            } catch (Model.AttemptOutOfBoundsException e) {
-                                view.printRulesViolatedMessage();
+                        try {
+                            if (model.checkAttempt(attempt)) {
+                                view.printWinnerMessage();
+                                correctAnswer = true;
+                                addGameStatsToModel(true, allAttempts);
+                            } else {
+                                view.printTryAgainMessage(new StringBuilder((attempt < model.getCorrectAnswer()) ? "lesser" : "bigger").toString());
                             }
-                        } else {
-                            view.printAlreadyUsedNumberMessage();
+                            allAttempts.add(attempt);
+                            attemptsCount++;
+                        } catch (Model.AttemptOutOfBoundsException e) {
+                            view.printRulesViolatedMessage();
                         }
                     }
                     break;
-                } catch (NumberFormatException e){
+                } catch (NumberFormatException e) {
                     view.printWrongInputMessage();
                 }
             }
         }
-        return gameInfo;
+    }
+
+    private void addGameStatsToModel(boolean result, ArrayList<Integer> allAttempts) {
+        HashMap<Boolean, ArrayList<Integer>> gameStats = new HashMap<>();
+        gameStats.put(result, allAttempts);
+        model.addGameStats(gameStats);
     }
 
 }

@@ -1,32 +1,72 @@
 package net.shvdy;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
+
+/**
+ *
+ */
 public class Model {
 
-    public static final int MIN_RANGE = 0;
-    public static final int MAX_RANGE = 100;
-    private int correctAnswer;
+    private int minRange, maxRange, correctAnswer;
+    private ArrayList<HashMap<Boolean, ArrayList<Integer>>> sessionStats = new ArrayList();
+    private HashMap<Boolean, ArrayList<Integer>> gameStats = new HashMap<>();
 
     public class AttemptOutOfBoundsException extends Exception {
-
     }
 
-    public int getCorrectAnswer(){
+    public int getCorrectAnswer() {
         return correctAnswer;
     }
 
-    public Model(){
+    public int getMinRange() {
+        return minRange;
+    }
+
+    public int getMaxRange() {
+        return maxRange;
+    }
+
+    public void setForNewGame() {
+        minRange = 1;
+        maxRange = 99;
         correctAnswer = generateAnswer();
     }
 
-    public static int generateAnswer(){
-        return (int)(Math.random() * ((MAX_RANGE - MIN_RANGE + 1))) + MIN_RANGE;
+    public void addGameStats(HashMap<Boolean, ArrayList<Integer>> gameStats) {
+        sessionStats.add(gameStats);
     }
 
-    public boolean checkAttempt (int attempt) throws AttemptOutOfBoundsException {
+    public ArrayList<HashMap<Boolean, ArrayList<Integer>>> getSessionStats() {
+        return sessionStats;
+    }
+
+    public Model() {
+        setForNewGame();
+    }
+
+
+    /**
+     * Passed all tests
+     */
+    private int generateAnswer() {
+        Random rnd = new Random();
+        return rnd.nextInt(maxRange) + 1;
+    }
+
+    public void changeBoundaries(int attempt) {
+        if (attempt < correctAnswer) minRange = attempt + 1;
+        else maxRange = attempt - 1;
+    }
+
+
+    public boolean checkAttempt(int attempt) throws AttemptOutOfBoundsException {
         if (attempt == correctAnswer) return true;
-        else if (( MIN_RANGE > attempt) || ( attempt > MAX_RANGE)) {
+        else if ((minRange > attempt) || (attempt > maxRange)) {
             throw new AttemptOutOfBoundsException();
         }
+        changeBoundaries(attempt);
         return false;
     }
 }
