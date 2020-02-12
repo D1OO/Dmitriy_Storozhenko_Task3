@@ -1,13 +1,13 @@
 package net.shvdy;
 
+import net.shvdy.controller.Controller;
+import net.shvdy.view.View;
+
 public class Main {
 
     public static void main(String[] args) {
-        Model model = new Model();
-        View view = new View();
-        Controller controller = new Controller(model, view);
-        
-        controller.processSession();
+        Controller controller = new Controller();
+        controller.processSession(new View());
     }
 
 }
