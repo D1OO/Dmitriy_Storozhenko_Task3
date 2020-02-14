@@ -1,4 +1,12 @@
-﻿package net.shvdy.controller;
+/**NoteCreatorController
+ *
+ * version 2
+ *
+ * 13.02.2020
+ *
+ * Copyright(r) shvdy
+ */
+package net.shvdy.controller;
 
 import net.shvdy.model.Note;
 import net.shvdy.model.NoteBook;
@@ -6,65 +14,119 @@ import net.shvdy.view.View;
 
 import java.math.BigInteger;
 import java.util.HashMap;
-import java.util.ResourceBundle;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Scanner;
 
-public class NoteCreatorController {
-    private View view;
+class NoteCreatorController extends Controller {
+    private Controller controller;
+    private UtilityController utilities;
     private Scanner sc;
-    private UtilityController uc;
 
-    public NoteCreatorController(View view, Scanner sc) {
-        this.view = view;
-        this.sc = sc;
-        uc = new UtilityController(view);
+    NoteCreatorController(Controller controller) {
+        this.controller = controller;
+        utilities = controller.utilities;
+        sc = controller.sc;
     }
 
-    public void createNotes(ResourceBundle currentLocale, NoteBook notebook) {
-        boolean terminateMakingNotes = false;
+    void createNotes(NoteBook notebook) {
+        boolean keepMakingNotes = true;
 
-        while (!terminateMakingNotes) {
-
-            view.printMessage(currentLocale.getString("NEW_NOTE_CREATION_MSG"));
+        while (keepMakingNotes) {
             Note newNote = new Note();
             HashMap<String, Object> noteProperties = newNote.getParameters();
+            boolean done = false;
+            controller.view.printLocalisedMessage(View.INPUT_NEW_NOTE_MSG);
 
-            for (String property : noteProperties.keySet()) {
-                noteProperties.put(property, uc.getVerifiedUserInput(sc, currentLocale, property));
+            for (Map.Entry<String, Object> property : noteProperties.entrySet()) {
+                String propertyKey = property.getKey();
+                if (!(propertyKey.equals("full_name") ||
+                        propertyKey.equals("full_address") ||
+                        propertyKey.equals("date_created") ||
+                        propertyKey.equals("date_modified"))) {
+                    if (propertyKey.equals("groups")) {
+                        property.setValue(utilities.getVerifiedUserGroupsInput());
+                    } else {
+                        property.setValue(utilities.getVerifiedUserInput(property));
+                    }
+                }
             }
+
+            noteProperties.put("full_name", concatenateString((String) noteProperties.get("surname"), " ",
+                    ((String) noteProperties.get("name")).substring(0, 0), "."));
+            noteProperties.put("full_address", concatenateString(
+                    (String) noteProperties.get("index"), " ",
+                    (String) noteProperties.get("city"), " ",
+                    (String) noteProperties.get("street"), " ",
+                    (String) noteProperties.get("home_number"), " ",
+                    (String) noteProperties.get("apartment_number")));
 
             notebook.addNote(newNote);
 
-            boolean done = false;
             while (!done) {
                 boolean viewCreatedNotes = false;
-                view.printMessage(currentLocale.getString("CREATE_ANOTHER_NOTE_OR_VIEW_CREATED_OR_EXIT_MSG"));
+                controller.view.printLocalisedMessage(View.CHOOSE_ACTION_AFTER_NOTE_CREATED_MSG);
                 try {
                     int actionCode = sc.nextInt();
-                    if ((actionCode != 1) || (actionCode != 2) || (actionCode != 3)) throw new Exception();
+                    sc.nextLine();
+                    if (!((actionCode == 1) || (actionCode == 2) || (actionCode == 3))) throw new Exception();
                     switch (actionCode) {
                         case 1:
                             done = true;
+                            break;
                         case 2:
                             viewCreatedNotes = true;
+                            break;
                         case 3:
-                            terminateMakingNotes = true;
+                            keepMakingNotes = false;
+                            done = true;
+                            break;
                     }
                 } catch (Exception e) {
-                    view.printMessage(currentLocale.getString("WRONG_INPUT_MSG"));
+                    controller.view.printLocalisedMessage(View.WRONG_INPUT_MSG);
                 }
                 if (viewCreatedNotes) {
-                    HashMap<BigInteger, Note> createdNotes = notebook.getNotes();
-                    for (BigInteger id : createdNotes.keySet()) {
-                        Note note = createdNotes.get(id);
-                        StringBuilder sb = new StringBuilder();
-                        sb.append(note.getId()).append(" ")
-                                .append(note.getSurname()).append(" ")
-                                .append(note.getNick())
-                                .append("\n\t");
-                    }
+                    viewCreatedNotes(notebook);
                 }
             }
         }
+    }
+
+
+    private void viewCreatedNotes(NoteBook notebook) {
+        HashMap<BigInteger, Note> createdNotes = (HashMap<BigInteger, Note>) notebook.getParameters().get("notes");
+        for (Map.Entry<BigInteger, Note> note : createdNotes.entrySet()) {
+
+            HashMap<String, Object> properties = note.getValue().getParameters();
+
+            controller.view.printMessage("\n----------[", note.getKey().toString(), "]---------\n");
+            for (Map.Entry<String, Object> prop : properties.entrySet()) {
+                switch (prop.getKey()) {
+                    case ("groups"):
+                        StringBuilder groupsString = new StringBuilder();
+                        for (Note.Groups group : (HashSet<Note.Groups>) prop.getValue()) {
+                            groupsString.append(group.toString());
+                        }
+                        printNotePropertyString(prop.getKey(), groupsString.toString());
+                        break;
+                    default:
+                        printNotePropertyString(prop.getKey(), prop.getValue().toString());
+                }
+            }
+            controller.view.printMessage("\n-------------------------------------\n");
+
+        }
+    }
+
+    private void printNotePropertyString(String name, String value) {
+        controller.view.printMessage("\t", controller.view.getPropertyLocalisation(name), ": ", value);
+    }
+
+    private String concatenateString(String... pieces) {
+        StringBuilder sb = new StringBuilder();
+        for (String p : pieces) {
+            sb.append(p);
+        }
+        return sb.toString();
     }
 }

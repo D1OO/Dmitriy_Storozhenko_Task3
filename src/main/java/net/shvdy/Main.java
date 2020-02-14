@@ -1,3 +1,12 @@
+/**
+ * Main
+ *
+ * version 1
+ *
+ * 11.02.2020
+ *
+ * Copyright(r) shvdy
+ */
 package net.shvdy;
 
 import net.shvdy.controller.Controller;
