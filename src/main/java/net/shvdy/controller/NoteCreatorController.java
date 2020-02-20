@@ -1,16 +1,16 @@
-/**NoteCreatorController
- *
+/**
+ * NoteCreatorController
+ * <p>
  * version 2
- *
+ * <p>
  * 13.02.2020
- *
+ * <p>
  * Copyright(r) shvdy
  */
 package net.shvdy.controller;
 
 import net.shvdy.model.Note;
 import net.shvdy.model.NoteBook;
-import net.shvdy.view.View;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -18,13 +18,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
 
-class NoteCreatorController extends Controller {
-    private Controller controller;
+class NoteCreatorController {
+    private ViewController viewController;
     private UtilityController utilities;
     private Scanner sc;
 
     NoteCreatorController(Controller controller) {
-        this.controller = controller;
+        viewController = controller.viewController;
         utilities = controller.utilities;
         sc = controller.sc;
     }
@@ -36,7 +36,7 @@ class NoteCreatorController extends Controller {
             Note newNote = new Note();
             HashMap<String, Object> noteProperties = newNote.getParameters();
             boolean done = false;
-            controller.view.printLocalisedMessage(View.INPUT_NEW_NOTE_MSG);
+            viewController.printLocalisedMessage(ViewController.INPUT_NEW_NOTE_MSG);
 
             for (Map.Entry<String, Object> property : noteProperties.entrySet()) {
                 String propertyKey = property.getKey();
@@ -65,7 +65,7 @@ class NoteCreatorController extends Controller {
 
             while (!done) {
                 boolean viewCreatedNotes = false;
-                controller.view.printLocalisedMessage(View.CHOOSE_ACTION_AFTER_NOTE_CREATED_MSG);
+                viewController.printLocalisedMessage(ViewController.CHOOSE_ACTION_AFTER_NOTE_CREATED_MSG);
                 try {
                     int actionCode = sc.nextInt();
                     sc.nextLine();
@@ -83,7 +83,7 @@ class NoteCreatorController extends Controller {
                             break;
                     }
                 } catch (Exception e) {
-                    controller.view.printLocalisedMessage(View.WRONG_INPUT_MSG);
+                    viewController.printLocalisedMessage(ViewController.WRONG_INPUT_MSG);
                 }
                 if (viewCreatedNotes) {
                     viewCreatedNotes(notebook);
@@ -99,7 +99,7 @@ class NoteCreatorController extends Controller {
 
             HashMap<String, Object> properties = note.getValue().getParameters();
 
-            controller.view.printMessage("\n----------[", note.getKey().toString(), "]---------\n");
+            viewController.printMessage("\n----------[", note.getKey().toString(), "]---------\n");
             for (Map.Entry<String, Object> prop : properties.entrySet()) {
                 switch (prop.getKey()) {
                     case ("groups"):
@@ -113,13 +113,13 @@ class NoteCreatorController extends Controller {
                         printNotePropertyString(prop.getKey(), prop.getValue().toString());
                 }
             }
-            controller.view.printMessage("\n-------------------------------------\n");
+            viewController.printMessage("\n-------------------------------------\n");
 
         }
     }
 
     private void printNotePropertyString(String name, String value) {
-        controller.view.printMessage("\t", controller.view.getPropertyLocalisation(name), ": ", value);
+        viewController.printMessage("\t", viewController.getPropertyLocalisation(name), ": ", value);
     }
 
     private String concatenateString(String... pieces) {

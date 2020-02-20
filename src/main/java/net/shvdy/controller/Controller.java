@@ -1,10 +1,10 @@
 /**
  * Controller
- *
- * version 2
- *
+ * <p>
+ * version 3
+ * <p>
  * 13.02.2020
- *
+ * <p>
  * Copyright(r) shvdy
  */
 package net.shvdy.controller;
@@ -23,26 +23,27 @@ public class Controller {
     View view;
     Scanner sc = new Scanner(System.in);
     ResourcesBrowser resourcesBrowser = new ResourcesBrowser();
+    ViewController viewController;
     UtilityController utilities;
-    private NoteCreatorController noteCreator;
 
-    public void processSession(View passedView) {
-        view = passedView;
+    public void processSession(View viewLink) {
+        NoteCreatorController noteCreator;
+        view = viewLink;
         try {
             resourcesBrowser.loadFromJarResources();
-            view.setCurrentLocale(receiveAndSetLocale());
-            utilities = new UtilityController(this);
-            noteCreator = new NoteCreatorController(this);
         } catch (IOException | URISyntaxException e) {
             view.printMessage("Internal error \n");
         }
 
-        view.printLocalisedMessage(view.WELCOME_MSG);
+        viewController = new ViewController(view, inquireAndGetLanguageBundle());
+        utilities = new UtilityController(this);
+        noteCreator = new NoteCreatorController(this);
+        viewController.printLocalisedMessage(ViewController.WELCOME_MSG);
 
         NoteBook newNotebook = createNoteBook();
         noteCreator.createNotes(newNotebook);
 
-        view.printLocalisedMessage(view.GOODBYE_MSG);
+        viewController.printLocalisedMessage(ViewController.GOODBYE_MSG);
     }
 
     /**
@@ -52,9 +53,8 @@ public class Controller {
      * @return ResourceBundle of locale chosen by user
      * @see ResourceBundle
      */
-    private ResourceBundle receiveAndSetLocale() {
+    private ResourceBundle inquireAndGetLanguageBundle() {
         List<Locale> availableLocales;
-        int chosenLangCode;
         StringBuilder chooseLangMsg = new StringBuilder();
 
         availableLocales = resourcesBrowser.getAvailableLocales();
@@ -64,15 +64,16 @@ public class Controller {
             chooseLangMsg.append("\n\t").append(i + 1).append(". ").append(availableLocales.get(i).toString().toUpperCase());
         }
 
+        int chosenLangCode;
         while (true) {
-            view.printMessage(chooseLangMsg.toString());
+            viewController.printMessage(chooseLangMsg.toString());
             try {
                 chosenLangCode = sc.nextInt();
                 sc.nextLine();
-                if ((chosenLangCode > availableLocales.size() || (chosenLangCode < 1))) throw new Exception();
+                if (chosenLangCode > availableLocales.size() || chosenLangCode < 1) throw new Exception();
                 break;
             } catch (Exception e) {
-                view.printLocalisedMessage(View.WRONG_INPUT_MSG);
+                viewController.printLocalisedMessage(ViewController.WRONG_INPUT_MSG);
             }
         }
 
@@ -82,5 +83,4 @@ public class Controller {
     private NoteBook createNoteBook() {
         return new NoteBook();
     }
-
 }

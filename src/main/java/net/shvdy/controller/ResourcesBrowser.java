@@ -1,10 +1,10 @@
 /**
  * ResourceBrowser
- *
+ * <p>
  * version 2
- *
+ * <p>
  * 13.02.2020
- *
+ * <p>
  * Copyright(r) shvdy
  */
 package net.shvdy.controller;
@@ -24,8 +24,8 @@ import java.util.zip.ZipInputStream;
 /**
  * Scans jar /resources folder on avaliable ".properties" files,
  * saves all localisations to {@link List}<{@link Locale}> and regular expressions as {@link List}<{@link ResourceBundle}></{@link>
- * @see ResourceBundle
  *
+ * @see ResourceBundle
  */
 class ResourcesBrowser {
     private List<Locale> availableLocales = new ArrayList<>();
@@ -42,8 +42,8 @@ class ResourcesBrowser {
     /**
      * Scans jar /resources folder on avaliable ".properties" files,
      * saves all localisations to {@link List}<{@link Locale}> and regular expressions as {@link List}<{@link ResourceBundle}></{@link>
-     * @see ResourceBundle
      *
+     * @see ResourceBundle
      */
     void loadFromJarResources() throws IOException, URISyntaxException {
         CodeSource src = ResourcesBrowser.class.getProtectionDomain().getCodeSource();
@@ -62,9 +62,7 @@ class ResourcesBrowser {
                 availableLocales.add(new Locale(entryName
                         .replaceFirst("controller/locale_", "")
                         .replaceFirst(".properties", "")));
-            }
-
-            else if (entryName.startsWith("controller/regex_") && entryName.endsWith(".properties")) {
+            } else if (entryName.startsWith("controller/regex_") && entryName.endsWith(".properties")) {
                 availableRegex.add(ResourceBundle.getBundle("controller/regex",
                         new Locale(entryName
                                 .replaceFirst("controller/regex_", "")

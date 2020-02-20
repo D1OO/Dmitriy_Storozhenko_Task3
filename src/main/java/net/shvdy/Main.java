@@ -1,10 +1,10 @@
 /**
  * Main
- *
+ * <p>
  * version 1
- *
+ * <p>
  * 11.02.2020
- *
+ * <p>
  * Copyright(r) shvdy
  */
 package net.shvdy;
@@ -18,5 +18,4 @@ public class Main {
         Controller controller = new Controller();
         controller.processSession(new View());
     }
-
 }
