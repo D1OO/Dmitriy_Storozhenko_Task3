@@ -27,9 +27,12 @@ public class ViewController {
     public ResourceBundle currentLocale;
     private View view;
 
-    ViewController(View view, ResourceBundle rb) {
-        currentLocale = rb;
+    ViewController(View view) {
         this.view = view;
+    }
+
+    void setLocale(ResourceBundle rb) {
+        currentLocale = rb;
     }
 
     public void printMessage(String message) {

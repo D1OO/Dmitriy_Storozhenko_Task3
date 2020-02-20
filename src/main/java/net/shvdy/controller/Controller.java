@@ -27,17 +27,18 @@ public class Controller {
     UtilityController utilities;
 
     public void processSession(View viewLink) {
-        NoteCreatorController noteCreator;
-        view = viewLink;
         try {
             resourcesBrowser.loadFromJarResources();
         } catch (IOException | URISyntaxException e) {
             view.printMessage("Internal error \n");
         }
 
-        viewController = new ViewController(view, inquireAndGetLanguageBundle());
+        view = viewLink;
+        viewController = new ViewController(view);
         utilities = new UtilityController(this);
-        noteCreator = new NoteCreatorController(this);
+        NoteCreatorController noteCreator = new NoteCreatorController(this);
+
+        viewController.setLocale(inquireAndGetLanguageBundle());
         viewController.printLocalisedMessage(ViewController.WELCOME_MSG);
 
         NoteBook newNotebook = createNoteBook();
