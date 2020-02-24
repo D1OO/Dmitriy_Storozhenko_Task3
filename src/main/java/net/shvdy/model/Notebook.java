@@ -15,7 +15,6 @@ import java.util.HashMap;
 public class Notebook extends ModelObject {
 
     public Notebook() {
-        super();
         fillProperties();
     }
 

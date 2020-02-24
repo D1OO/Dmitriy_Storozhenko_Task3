@@ -15,7 +15,6 @@ import java.util.LinkedHashMap;
 public class Note extends ModelObject {
 
     public Note() {
-        super();
         fillProperties();
     }
 
