@@ -58,6 +58,8 @@ public class Controller {
             resourcesBrowser.loadFromJarResources();
         } catch (IOException | URISyntaxException e) {
             view.printMessage("Internal error \n");
+            e.printStackTrace();
+            System.exit(-1);
         }
 
         view = v;
