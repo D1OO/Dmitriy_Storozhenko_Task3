@@ -23,12 +23,13 @@ public class ViewController {
     public static final String GOODBYE_MSG = "message.goodbye";
     public static final String AVAILABLE_GROUPS_MSG = "message.available.groups";
     public static final String CHOOSE_GROUPS_MSG = "message.choose.groups";
+    public static final String EXISTING_VALUE_MSG = "message.existing_value";
 
     public ResourceBundle currentLocale;
     private View view;
 
-    ViewController(View view) {
-        this.view = view;
+    ViewController(Controller c) {
+        this.view = c.getView();
     }
 
     void setLocale(ResourceBundle rb) {
@@ -61,5 +62,9 @@ public class ViewController {
             concatString.append(v);
         }
         return new String(concatString);
+    }
+
+    public void printNotePropertyString(String name, String value) {
+        printMessage("\t", getPropertyLocalisation(name), ": ", value);
     }
 }

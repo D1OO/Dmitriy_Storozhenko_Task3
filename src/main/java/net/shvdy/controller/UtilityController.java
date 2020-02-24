@@ -9,26 +9,31 @@
  */
 package net.shvdy.controller;
 
+import net.shvdy.model.Model;
 import net.shvdy.model.Note;
+import net.shvdy.model.Notebook;
 
+import java.math.BigInteger;
 import java.util.*;
 
 class UtilityController {
+    private Model model;
     private ViewController viewController;
     private Scanner sc;
     private List<ResourceBundle> regexBundles;
 
     UtilityController(Controller controller) {
-        this.viewController = controller.viewController;
-        this.sc = controller.sc;
-        regexBundles = controller.resourcesBrowser.getAvailableRegex();
+        model = controller.getModel();
+        viewController = controller.getViewController();
+        sc = controller.getSc();
+        regexBundles = controller.getResourcesBrowser().getAvailableRegex();
     }
 
     /**
      * Verifies user entered strings with the regular expressions, bundled in /resources folder,
      * an string match any language's regexp
      */
-    String getVerifiedUserInput(Map.Entry<String, Object> property) {
+    String getVerifiedUserInput(Map.Entry<String, String> property) {
         String propertyName = property.getKey();
 
         while (true) {
@@ -52,12 +57,13 @@ class UtilityController {
      */
     HashSet<Note.Groups> getVerifiedUserGroupsInput() {
         HashSet<Note.Groups> chosenGroups = new HashSet<>();
-        List<Note.Groups> availableGroups = Arrays.asList(Note.Groups.values());
+        Note.Groups[] availableGroups = Note.Groups.values();
 
         while (true) {
-            viewController.printMessage(viewController.getMessageLocalisation(ViewController.AVAILABLE_GROUPS_MSG), " ", availableGroups.toString(), "\n",
+            viewController.printMessage(viewController.getMessageLocalisation(ViewController.AVAILABLE_GROUPS_MSG), " ",
+                    getGroupsString(Arrays.asList(availableGroups)), "\n",
                     viewController.getMessageLocalisation(ViewController.CHOOSE_GROUPS_MSG), "1 - ",
-                    String.valueOf(availableGroups.size()), "\n");
+                    String.valueOf(availableGroups.length), "\n");
 
             String userInput = sc.nextLine();
             int[] inputToArr;
@@ -70,10 +76,65 @@ class UtilityController {
             }
 
             for (int i : inputToArr) {
-                chosenGroups.add(availableGroups.get(i - 1));
+                chosenGroups.add(availableGroups[i - 1]);
             }
             return chosenGroups;
         }
+    }
+
+    void getUniqueInput(Notebook notebook, Map.Entry<String, String> property) {
+        while (true) {
+            String value = getVerifiedUserInput(property);
+            try {
+                model.checkDataForUniqueness(notebook, property.getKey(), value);
+            } catch (Model.NotUniqueDataException e) {
+                viewController.printMessage(e.getValue(), ": ",
+                        viewController.getMessageLocalisation(ViewController.EXISTING_VALUE_MSG),
+                        " '", viewController.getPropertyLocalisation(e.getKey()), "'");
+                continue;
+            }
+            property.setValue(value);
+            break;
+        }
+    }
+
+    void viewCreatedNotes(Notebook notebook) {
+        HashMap<BigInteger, Note> createdNotes = (HashMap<BigInteger, Note>) notebook.getProperties().get("notes");
+        for (Map.Entry<BigInteger, Note> note : createdNotes.entrySet()) {
+            HashMap<String, String> properties = note.getValue().getPropertiesStringsForUserInput();
+            viewController.printMessage("\n----------[", note.getKey().toString(), "]---------\n");
+
+            for (Map.Entry<String, String> prop : properties.entrySet()) {
+                viewController.printNotePropertyString(prop.getKey(), prop.getValue());
+            }
+
+            for (Map.Entry<String, Object> prop : note.getValue().getProperties().entrySet()) {
+                if (prop.getValue().getClass().equals(HashSet.class)) {
+                    viewController.printNotePropertyString("groups",
+                            getGroupsString(Arrays.asList(((HashSet) prop.getValue()).toArray())));
+                } else if (prop.getValue().getClass().equals(String.class))
+                    viewController.printNotePropertyString(prop.getKey(), (String) prop.getValue());
+            }
+        }
+        viewController.printMessage("\n-------------------------------------\n");
+    }
+
+    String buildString(String... pieces) {
+        StringBuilder sb = new StringBuilder();
+        for (String p : pieces) {
+            sb.append(p);
+        }
+        return sb.toString();
+    }
+
+    String getGroupsString(List<Object> g) {
+        StringBuilder s = new StringBuilder();
+        for (Object group : g) {
+            s.append(buildString(
+                    "[", viewController.getPropertyLocalisation("groups." + group.toString().toLowerCase())
+                    , "] "));
+        }
+        return s.toString();
     }
 }
 

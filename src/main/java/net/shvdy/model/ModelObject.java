@@ -13,11 +13,13 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Random;
 
 public abstract class ModelObject {
     private BigInteger id;
-    protected HashMap<String, Object> properties = new HashMap<>();
+    private HashMap<String, Object> properties = new HashMap<>();
+    private LinkedHashMap<String, String> propertiesStringsForUserInput = new LinkedHashMap<>();
 
     ModelObject() {
         id = new BigInteger(3 + (LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMuuHHmmssSSS")) +
@@ -31,7 +33,11 @@ public abstract class ModelObject {
         return id;
     }
 
-    public HashMap<String, Object> getParameters() {
+    public HashMap<String, Object> getProperties() {
         return properties;
+    }
+
+    public LinkedHashMap<String, String> getPropertiesStringsForUserInput() {
+        return propertiesStringsForUserInput;
     }
 }

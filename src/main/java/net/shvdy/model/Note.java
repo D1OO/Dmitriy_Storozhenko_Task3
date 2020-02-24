@@ -10,6 +10,7 @@
 package net.shvdy.model;
 
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 
 public class Note extends ModelObject {
 
@@ -21,17 +22,16 @@ public class Note extends ModelObject {
     public enum Groups {
         FRIENDS,
         RELATIVES,
-        WORK;
+        WORK
     }
 
     private void fillProperties() {
-        properties.put("surname", "Default Surname");
-        properties.put("name", "Default Name");
-        properties.put("login", "Default Login");
+        getProperties().put("groups", new HashSet<Groups>());
+        LinkedHashMap<String, String> properties = getPropertiesStringsForUserInput();
+        properties.put("surname", "Default");
+        properties.put("name", "Default");
+        properties.put("login", "Default");
         properties.put("patronymic", "Default");
-        properties.put("full_name", "Default");
-        properties.put("comment", "Default");
-        properties.put("groups", new HashSet<Groups>());
         properties.put("phone_number_home", "Default");
         properties.put("phone_number_mobile", "Default");
         properties.put("phone_number_mobile_second", "Default");
@@ -42,7 +42,6 @@ public class Note extends ModelObject {
         properties.put("street", "Default");
         properties.put("home_number", "Default");
         properties.put("apartment_number", "Default");
-        properties.put("full_address", "Default");
+        properties.put("comment", "Default");
     }
-
 }

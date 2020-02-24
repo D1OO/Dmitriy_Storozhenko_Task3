@@ -22,8 +22,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /**
- * Scans jar /resources folder on avaliable ".properties" files,
- * saves all localisations to {@link List}<{@link Locale}> and regular expressions as {@link List}<{@link ResourceBundle}></{@link>
+ * Scans jar /resources folder on available ".properties" files,
+ * saves all localisations to {@link List}<{@link Locale}> and regular expressions as {@link List}<{@link ResourceBundle}>
  *
  * @see ResourceBundle
  */
@@ -40,7 +40,7 @@ class ResourcesBrowser {
     }
 
     /**
-     * Scans jar /resources folder on avaliable ".properties" files,
+     * Scans jar /resources folder on available ".properties" files,
      * saves all localisations to {@link List}<{@link Locale}> and regular expressions as {@link List}<{@link ResourceBundle}></{@link>
      *
      * @see ResourceBundle
@@ -48,7 +48,7 @@ class ResourcesBrowser {
     void loadFromJarResources() throws IOException, URISyntaxException {
         CodeSource src = ResourcesBrowser.class.getProtectionDomain().getCodeSource();
         ZipInputStream jar = null;
-        ZipEntry ze = null;
+        ZipEntry ze;
 
         if (src != null) {
             URI jarUri = new URI(src.getLocation().toString());

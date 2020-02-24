@@ -9,7 +9,8 @@
  */
 package net.shvdy.controller;
 
-import net.shvdy.model.NoteBook;
+import net.shvdy.model.Model;
+import net.shvdy.model.Notebook;
 import net.shvdy.view.View;
 
 import java.io.IOException;
@@ -20,28 +21,55 @@ import java.util.ResourceBundle;
 import java.util.Scanner;
 
 public class Controller {
-    View view;
-    Scanner sc = new Scanner(System.in);
-    ResourcesBrowser resourcesBrowser = new ResourcesBrowser();
-    ViewController viewController;
-    UtilityController utilities;
+    private View view;
 
-    public void processSession(View viewLink) {
+    private Model model;
+    private Scanner sc = new Scanner(System.in);
+    private ResourcesBrowser resourcesBrowser = new ResourcesBrowser();
+    private ViewController viewController;
+    private UtilityController utilities;
+
+    public View getView() {
+        return view;
+    }
+
+    public Model getModel() {
+        return model;
+    }
+
+    public Scanner getSc() {
+        return sc;
+    }
+
+    public ResourcesBrowser getResourcesBrowser() {
+        return resourcesBrowser;
+    }
+
+    public ViewController getViewController() {
+        return viewController;
+    }
+
+    public UtilityController getUtilities() {
+        return utilities;
+    }
+
+    public void processSession(View v, Model m) {
         try {
             resourcesBrowser.loadFromJarResources();
         } catch (IOException | URISyntaxException e) {
             view.printMessage("Internal error \n");
         }
 
-        view = viewLink;
-        viewController = new ViewController(view);
+        view = v;
+        model = m;
+        viewController = new ViewController(this);
         utilities = new UtilityController(this);
         NoteCreatorController noteCreator = new NoteCreatorController(this);
 
         viewController.setLocale(inquireAndGetLanguageBundle());
         viewController.printLocalisedMessage(ViewController.WELCOME_MSG);
 
-        NoteBook newNotebook = createNoteBook();
+        Notebook newNotebook = createNoteBook();
         noteCreator.createNotes(newNotebook);
 
         viewController.printLocalisedMessage(ViewController.GOODBYE_MSG);
@@ -81,7 +109,7 @@ public class Controller {
         return ResourceBundle.getBundle("controller/locale", availableLocales.get(chosenLangCode - 1));
     }
 
-    private NoteBook createNoteBook() {
-        return new NoteBook();
+    private Notebook createNoteBook() {
+        return new Notebook();
     }
 }

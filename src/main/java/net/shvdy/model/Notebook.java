@@ -12,21 +12,21 @@ package net.shvdy.model;
 import java.math.BigInteger;
 import java.util.HashMap;
 
-public class NoteBook extends ModelObject {
+public class Notebook extends ModelObject {
 
-    public NoteBook() {
+    public Notebook() {
         super();
         fillProperties();
     }
 
     private void fillProperties() {
+        getProperties().put("notes", new HashMap<BigInteger, Note>());
+        HashMap<String, String> properties = getPropertiesStringsForUserInput();
         properties.put("name", "Default Notebook");
         properties.put("owner", "Default Owner");
-        properties.put("notes", new HashMap<BigInteger, Note>());
     }
 
     public void addNote(Note note) {
-        ((HashMap<BigInteger, Note>) properties.get("notes")).put(note.getId(), note);
+        ((HashMap<BigInteger, Note>) getProperties().get("notes")).put(note.getId(), note);
     }
-
 }
